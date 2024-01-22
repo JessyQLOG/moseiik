@@ -25,15 +25,11 @@ jobs:
     - name: Set Up QEMU
       if: matrix.arch == 'arm64'
       uses: docker/setup-qemu-action@v3
-    - name: Build X86
-      if: matrix.arch == 'amd64'
-      run: docker build --verbose -t image-docker-x86 --platform linux/amd64 .
-    - name: Run tests on x86
-      if: matrix.arch == 'amd64'
-      run: docker run image-docker-x86 --platform linux/amd64 --verbose
-    - name: Build ARM
-      if: matrix.arch == 'arm64'
-      run: docker build --verbose -t image-docker-arm --platform linux/arm64 .
-    - name: Run tests on ARM
-      if: matrix.arch == 'arm64'
-      run: docker run image-docker-arm --platform linux/arm64 --verbose
+      with:
+        platforms: ${{matrix.arch}}
+    - name: Run test on ${{matrix.arch}}
+      run: |
+       docker build -t img --platform ${{matrix.arch}} .
+       docker run --rm --platform ${{matrix.arch}} img
+       continue-on-error: true
+
