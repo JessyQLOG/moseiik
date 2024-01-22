@@ -11,33 +11,29 @@ jobs:
 
 
   build_and_test:
+    runs-on: ubuntu-latest
     strategy:
         # Creating a matrix for OSs specificities
         matrix:
-          config: 
-          - {
-              name: "ARM",
-              os: arm64
-            }
-          - {
-              name: "x86",
-              os: amd64
-            }
-    runs-on: ${{ matrix.config.os }}
+          arch: 
+            - linux/amd64
+            - linux/arm64
+    
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set Up QEMU
+      if: matrix.arch == 'arm64'
       uses: docker/setup-qemu-action@v3
     - name: Build X86
-      if: matrix.config.os == 'amd64'
+      if: matrix.arch == 'amd64'
       run: docker build --verbose -t image-docker-x86 --platform linux/amd64 .
     - name: Run tests on x86
-      if: matrix.config.os == 'amd64'
+      if: matrix.arch == 'amd64'
       run: docker run image-docker-x86 --platform linux/amd64 --verbose
     - name: Build ARM
-      if: matrix.config.os == 'arm64'
+      if: matrix.arch == 'arm64'
       run: docker build --verbose -t image-docker-arm --platform linux/arm64 .
     - name: Run tests on ARM
-      if: matrix.config.os == 'arm64'
+      if: matrix.arch == 'arm64'
       run: docker run image-docker-arm --platform linux/arm64 --verbose
