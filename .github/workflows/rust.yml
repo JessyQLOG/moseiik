@@ -31,5 +31,4 @@ jobs:
       run: |
        docker build -t img --platform ${{matrix.arch}} .
        docker run --rm --platform ${{matrix.arch}} img
-       continue-on-error: true
 
