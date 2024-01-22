@@ -15,7 +15,7 @@ jobs:
     strategy:
         # On créé un matrice pour les deux architectures possibles. 
         matrix:
-          platform: 
+          arch: 
             - linux/amd64
             - linux/arm64
     steps:
@@ -23,13 +23,13 @@ jobs:
 
     # Si nous exécutons les tests sur ARM il faut installer QEMU pour émuler l'architecture. 
     - name: Mise en place de QEMU
-      if: matrix.platform== 'linux/arm64'
+      if: matrix.arch== 'linux/arm64'
       uses: docker/setup-qemu-action@v3
       with:
-        platforms: ${{matrix.platform}}
-    - name: Run des tests sur l'archi ${{matrix.platform}}
+        platforms: ${{matrix.arch}}
+    - name: Run des tests sur l'archi ${{matrix.arch}}
       # On build l'image selon la plateforme considérée puis on la run.
       run: |
-       docker build -t img --platform ${{matrix.platform}} . 
-       docker run --rm --platform ${{matrix.platform}} img
+       docker build -t img --platform ${{matrix.arch}} . 
+       docker run --rm --platform ${{matrix.arch}} img
 
