@@ -23,7 +23,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set Up QEMU
-      if: matrix.arch == 'arm64'
+      if: matrix.arch == 'linux/arm64'
       uses: docker/setup-qemu-action@v3
       with:
         platforms: ${{matrix.arch}}
