@@ -23,7 +23,7 @@ jobs:
 
     # Si nous exécutons les tests sur ARM il faut installer QEMU pour émuler l'architecture. 
     - name: Mise en place de QEMU
-      if: matrix.arch == 'linux/arm64'
+      if: matrix.env== 'linux/arm64'
       uses: docker/setup-qemu-action@v3
       with:
         platforms: ${{matrix.env}}
