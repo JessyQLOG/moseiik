@@ -11,7 +11,7 @@ jobs:
 
 
   build_and_test:
-    runs-on: ubuntu:latest
+    runs-on: ubuntu/latest
     strategy:
         # On créé un matrice pour les deux architectures possibles. 
         matrix:
