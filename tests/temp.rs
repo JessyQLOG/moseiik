@@ -5,9 +5,19 @@ mod tests {
         io::Reader as ImageReader,
     };
 
+    /**
+     * TESTS D'INTÉGRATION
+     * Nous devions faire les tests d'intégration sur la base d'images fournie. 
+     * Or, la base d'image étant lourde, nous ne voulions ni la mettre sur le GitHub, ni la télécharger 
+     * à chaque éxécution sur GitHUb Action. Nous avons testé localement les tests d'intégration sur la base
+     * ceux-ci fonctionnaient. Afin de les exécuter sur GitHub Actions, on a lancé les tests de la fonction
+     * compute_mosaic sur les small-tiles. 
+     */
+
     #[test]
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     fn test_x86() {
+        
         let o = Options{
             image:String::from("assets/target-small.png"),
             output:String::from("assets/result-x86.png"),
@@ -37,7 +47,7 @@ mod tests {
             remove_used:false,
             verbose:false,
             simd:true,
-            num_thread,
+            num_thread:1,
         };
         compute_mosaic(o);
         let img1 = ImageReader::open("./assets/target-small.png").unwrap().decode().unwrap().to_rgb8();
