@@ -1,6 +1,6 @@
 FROM rust:latest
 WORKDIR /app
 RUN git clone https://github.com/JessyQLOG/moseiik.git
-RUN cd moseiik
+RUN cd /app/moseiik
 RUN cargo build --manifest-path=/app/moseiik/Cargo.toml --release
 ENTRYPOINT [ "cargo", "test", "--release", "--" ]
