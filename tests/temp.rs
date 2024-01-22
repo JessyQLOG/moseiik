@@ -61,7 +61,7 @@ mod tests {
         };
         compute_mosaic(o);
         let img1 = ImageReader::open("./assets/target-small.png").unwrap().decode().unwrap().to_rgb8();
-        let img2 = ImageReader::open("./assets/result-arm.png").unwrap().decode().unwrap().to_rgb8();
+        let img2 = ImageReader::open("./assets/result-generic.png").unwrap().decode().unwrap().to_rgb8();
         assert_eq!(img1, img2);
     }
 
