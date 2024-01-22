@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use clap::Parser;
 use image::{
     imageops::{resize, FilterType::Nearest},
@@ -349,23 +351,106 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    #[test]
+    use image::ImageBuffer;
+
+    use super::*;
+
+
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
-    fn unit_test_x86() {
-        // TODO
-        assert!(false);
+    #[test]
+    fn unit_test_l1_x86_same_img(){
+
+        let img1 = ImageReader::open("./assets/tiles-small/tile-1.png").unwrap().decode().unwrap().to_rgb8();
+        let img2 = ImageReader::open("./assets/tiles-small/tile-1.png").unwrap().decode().unwrap().to_rgb8();
+    
+        unsafe {
+            assert_eq!(l1_x86_sse2(&img1, &img2), 0)
+        }
     }
 
+    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     #[test]
+    fn unit_test_l1_x86_different_img(){
+
+        let img1 = ImageReader::open("./assets/tiles-small/tile-1.png").unwrap().decode().unwrap().to_rgb8();
+        let img2 = ImageReader::open("./assets/tile-full-black.png").unwrap().decode().unwrap().to_rgb8();
+    
+        unsafe {
+            assert_eq!(l1_x86_sse2(&img1, &img2), 5724*3) // il faut multiplier par 3 car la L1 se fait sur les 3 canaux RGB
+        }
+    }
+
     #[cfg(target_arch = "aarch64")]
-    fn unit_test_aarch64() {
-        // TODO
-        assert!(false);
+    #[test]
+    fn unit_test_l1_aarch64_same_img(){
+
+        let img1 = ImageReader::open("./assets/tiles-small/tile-1.png").unwrap().decode().unwrap().to_rgb8();
+        let img2 = ImageReader::open("./assets/tiles-small/tile-1.png").unwrap().decode().unwrap().to_rgb8();
+    
+        unsafe {
+            assert_eq!(l1_neon(&img1, &img2), 0)
+        }
+    }
+
+    #[cfg(target_arch = "aarch64")]
+    #[test]
+    fn unit_test_l1_aarch64_different_img(){
+
+        let img1 = ImageReader::open("./assets/tiles-small/tile-1.png").unwrap().decode().unwrap().to_rgb8();
+        let img2 = ImageReader::open("./assets/tile-full-black.png").unwrap().decode().unwrap().to_rgb8();
+    
+        unsafe {
+            assert_eq!(l1_neon(&img1, &img2), 5724*3)
+        }
     }
 
     #[test]
-    fn unit_test_generic() {
-        // TODO
-        assert!(false);
+    fn unit_test_l1_generic_same_img(){
+
+        let img1 = ImageReader::open("./assets/tiles-small/tile-1.png").unwrap().decode().unwrap().to_rgb8();
+        let img2 = ImageReader::open("./assets/tiles-small/tile-1.png").unwrap().decode().unwrap().to_rgb8();
+    
+        assert_eq!(l1_generic(&img1, &img2), 0)
+        
+    }
+
+    #[test]
+    fn unit_test_l1_generic_different_img(){
+
+        let img1 = ImageReader::open("./assets/tiles-small/tile-1.png").unwrap().decode().unwrap().to_rgb8();
+        let img2 = ImageReader::open("./assets/tile-full-black.png").unwrap().decode().unwrap().to_rgb8();
+
+        assert_eq!(l1_generic(&img1, &img2), 5724*3)
+    }
+
+
+    #[test]
+    fn unit_test_prepare_tiles(){
+
+        let s = Size {
+            height: 5,
+            width: 5,
+        };
+
+        let result = prepare_tiles("./assets/tiles-small/", &s, false).unwrap();
+        let mut is_ok = true;
+
+        
+        for elt in result{
+            is_ok &= (elt.width() == 5 && elt.height() == 5)
+        }
+
+        assert!(is_ok);
+    }
+    #[test]
+    fn unit_test_prepare_target(){
+        let scaling = 1;
+        let s = Size{
+            height:5,
+            width:5
+        };
+        let result = prepare_target("./assets/tiles-small/tile-1.png", scaling, &s).unwrap();
+        
+        assert!(result.width() == 5 && result.height() == 5);
     }
 }

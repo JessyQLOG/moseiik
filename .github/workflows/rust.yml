@@ -5,16 +5,39 @@ on:
     branches: [ "main" ]
 
 env:
-  CARGO_TERM_COLOR: always
+  CARGO_TERM_COLORCreate rust: always
 
 jobs:
-  build:
 
-    runs-on: ubuntu-latest
+
+  build_and_test:
+    strategy:
+        # Creating a matrix for OSs specificities
+        matrix:
+          config: 
+          - {
+              name: "ARM",
+              os: arm64
+            }
+          - {
+              name: "x86",
+              os: amd64
+            }
+    runs-on: ${{ matrix.config.os }}
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+    - name: Set Up QEMU
+      uses: docker/setup-qemu-action@v3
+    - name: Build X86
+      if: matrix.config.os == 'amd64'
+      run: docker build --verbose -t image-docker-x86 --platform linux/amd64 .
+    - name: Run tests on x86
+      if: matrix.config.os == 'amd64'
+      run: docker run image-docker-x86 --platform linux/amd64 --verbose
+    - name: Build ARM
+      if: matrix.config.os == 'arm64'
+      run: docker build --verbose -t image-docker-arm --platform linux/arm64 .
+    - name: Run tests on ARM
+      if: matrix.config.os == 'arm64'
+      run: docker run image-docker-arm --platform linux/arm64 --verbose
